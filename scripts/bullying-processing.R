@@ -61,6 +61,8 @@ for (i in 1:length(bully_files_noTrend)) {
   bullying <- rbind(bullying, current_file)
 }
 
+#Add statewide data...
+
 #backfill Districts
 district_dp_URL <- 'https://raw.githubusercontent.com/CT-Data-Collaborative/ct-school-district-list/master/datapackage.json'
 district_dp <- datapkg_read(path = district_dp_URL)
