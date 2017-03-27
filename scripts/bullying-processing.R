@@ -11,44 +11,15 @@ library(datapkg)
 
 #Setup environment
 sub_folders <- list.files()
-
-#Name to EdSight top level folder
-raw_from_github_location <- grep("Raw", sub_folders, value=T)
-
-#Path to EdSight top level folder
-raw_from_github_path <- (paste0(getwd(), "/", raw_from_github_location))
-
-#paths to EdSight data folder
-raw_dataset_paths <- list.dirs(raw_from_github_path, full.names = TRUE)
-
-#all DP "raw" paths
-all_DP_raw_paths <- ls(pattern="_dp_path")
-all_DP_raw_files <- ls(pattern="_files")
-
-# "bully_dp_path"          
-# "chronic_absent_dp_path" 
-# "coll_prep_dp_path"      
-# "disability_dp_path"     
-# "ed_qual_dp_path"       
-# "incidents_dp_path"      
-# "sanctions_dp_path"      
-# "staff_lvls_dp_path"     
-# "stdnt_enroll_dp_path"   
-# "susp_rates_dp_path"
-
-
-#assign rownames based on first column
-#assign colnames based on which ever row starts with District
-#remove rownames
-#colnames(current_file) = current_file[1, ] # the first row will be the header
-#remove first row
-#remove district code column
+data_location <- grep("raw$", sub_folders, value=T)
+path <- (paste0(getwd(), "/", data_location))
+all_csvs <- dir(path, recursive=T, pattern = ".csv") 
 
 bullying <- data.frame(stringsAsFactors = F)
-bully_files_noTrend <- grep("Trend", bully_files, value=T, invert=T)
+bully_files_noTrend <- grep("Trend", all_csvs, value=T, invert=T)
 ###Bullying###
 for (i in 1:length(bully_files_noTrend)) {
-  current_file <- read.csv(paste0(bully_dp_path, "/", bully_files_noTrend[i]), stringsAsFactors=F, header=F )
+  current_file <- read.csv(paste0(path, "/", bully_files_noTrend[i]), stringsAsFactors=F, header=F )
   current_file <- current_file[-c(1:3),]
   rownames(current_file) <- current_file[,1]
   colnames(current_file) <- current_file[which(rownames(current_file) %in% c("District", "DISTRICT")), ]
@@ -137,12 +108,10 @@ complete_bullying_long$`Measure Type` <- "Number"
 complete_bullying_long <- complete_bullying_long %>% 
   select(`District`, `FIPS`, `Year`, `Variable`, `Measure Type`, `Value`)
 
-bully_data_path <- (paste0(getwd(), "/", bully_dp_location))
-
 #Write CSV
 write.table(
   complete_bullying_long,
-  file.path(bully_data_path, "data", "bullying_2013-2016.csv"),
+  file.path(getwd(), "data", "bullying_2013-2016.csv"),
   sep = ",",
   row.names = F
 )

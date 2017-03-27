@@ -1,7 +1,10 @@
 Bullying
 
 [![Build Status](https://travis-ci.org/CT-Data-Collaborative/bullying.svg?branch=master)](https://travis-ci.org/CT-Data-Collaborative/bullying)
-A short description of the project.
+
+Bullying reports the Number of students with at least 1 bullying incident and Counts of Bullying Incidents, per district, per year.
+
+Data Source: <http://edsight.ct.gov/>
 
 ## License MIT
 

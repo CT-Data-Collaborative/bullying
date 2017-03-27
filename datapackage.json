@@ -2,7 +2,7 @@
   "name": "bullying",
   "datapackage_version": "1.0-beta.18",
   "title": "Bullying",
-  "description": "Description of dataset",
+  "description": "Bullying reports the Number of students with at least 1 bullying incident and Counts of Bullying Incidents, per district, per year.",
   "version": "1.0",
   "licenses": [{
     "url": "http://opendatacommons.org/licenses/pddl/",
@@ -21,42 +21,52 @@
   }],
   "contributor": [],
   "resources": [{
-    "path": "data/data.csv",
+    "path": "data/bullying_2013-2016.csv",
     "format": "csv",
     "schema": {
       "fields": [{
-          "name": "District",
-          "type": "string",
-          "dimension": false
-        }, {
-          "name": "FIPS",
-          "type": "string",
-          "dimension": false
-        }, {
-          "name": "Year",
-          "type": "string",
-          "dimension": false
-        }, {
-          "name": "Measure Type",
-          "type": "string",
-          "dimension": true
-        }, {
-          "name": "Variable",
-          "type": "string",
-          "dimension": true
-        }, {
-          "name": "Value",
-          "type": "number",
-          "dimension": false
-        }]
-      }
+        "name": "District",
+        "type": "string",
+        "dimension": false
+      }, {
+        "name": "FIPS",
+        "type": "string",
+        "dimension": false
+      }, {
+        "name": "Year",
+        "type": "string",
+        "dimension": false
+      }, {
+        "name": "Measure Type",
+        "type": "string",
+        "dimension": true,
+        "constraints": {
+			    "enum": [
+		      "Number"
+		      ]
+			  }
+      }, {
+        "name": "Variable",
+        "type": "string",
+        "dimension": true, 
+        "constraints": {
+		      "enum": [
+            "Number of students with at least 1 bullying incident",
+            "Counts of Bullying Incidents"
+          ]
+			  }
+      }, {
+        "name": "Value",
+        "type": "number",
+        "dimension": false
+      }]
     }
-  ],
+  }],
   "last_modified": "03/15/2017",
   "ckan_extras": {
     "full_description": {
       "ckan_name": "Full Description",
-      "value": "Expanded description",
+      "value": "The ED166 is the Student Disciplinary Offense Data Collection. The CSDE uses this data to satisfy various federal mandates such as the Individuals with Disabilities Education Act, the No Child Left Behind: Unsafe School Choice Option, and Special Education Reporting. All bullying incidents must be reported. The counts of bullying incidents are not student counts.",
       "type": "string"
     },
     "suppression": {
@@ -66,17 +76,17 @@
     },
     "technical_notes": {
       "ckan_name": "Technical Notes",
-      "value": "Technical notes for advanced users",
+      "value": "",
       "type": "string"
     },
     "socrata": {
       "ckan_name": "Socrata",
-      "value": "False",,
+      "value": "False",
       "type": "string"
     },
     "socrata_url": {
       "ckan_name": "Socrata Dataset URL",
-      "value": "",,
+      "value": "",
       "type": "string"
     },
     "domain": {
@@ -86,14 +96,16 @@
     },
     "subdomain": {
       "ckan_name": "Subdomain",
-      "value": "Topic within top level domain",
+      "value": "Student Behavior",
       "type": "string"
     },
     "geography": {
       "ckan_name": "Geography",
       "value": "District",
       "type": "string",
-      "constraints": {"enum": ["Town", "County", "Town/County", "District", "Other"]}
+      "constraints": {
+        "enum": ["Town", "County", "Town/County", "District", "Other"]
+      }
     },
     "frequency": {
       "ckan_name": "Frequency",
@@ -102,12 +114,12 @@
     },
     "years_in_catalog": {
       "ckan_name": "Years in Catalog",
-      "value": [],
+      "value": ["2012-2013", "2013-2014", "2014-2015", "2015-2016"],
       "type": "array"
     },
     "latest_year": {
       "ckan_name": "Latest Year Available",
-      "value": "2015",
+      "value": "2015-2016",
       "type": "string"
     },
     "disabled_views": {
@@ -123,11 +135,86 @@
         "Percent": "%"
       }
     },
-    "default": {}
+    "expected_number_of_geographies": {
+		  "ckan_name": "Expected Number of Unique Geographies",
+		  "value": 205,
+		  "type": "string"
+		},
+    "default": {
+      "ckan_name": "Default",
+			"value": {
+				"Measure Type": "Number",
+		 		"District": "Achievement First Bridgeport Academy District",
+		 		"Year": ["2012-2013"],
+		 		"Variable": "Number of students with at least 1 bullying incident"
+			},
+		  	"type": "object"
+    }  
   },
-  "spot_checks": [],
+  "spot_checks": [
+    {
+      "type": "$lookup",
+      "filter": {
+        "District": "Newington School District",
+        "Year": "2012-2013",
+        "Variable": "Number of students with at least 1 bullying incident",
+        "Measure Type": "Number" 
+      },
+      "expected": {
+        "type": "$match",
+        "number type": "int",
+        "value": 13
+      } 
+    },    
+    {
+      "type": "$lookup",
+      "filter": {
+        "District": "Farmington School District",
+        "Year": "2013-2014",
+        "Variable": "Counts of Bullying Incidents",
+        "Measure Type": "Number" 
+      },
+      "expected": {
+        "type": "$match",
+        "number type": "int",
+        "value": 10
+      }
+    },   
+    {
+      "type": "$lookup",
+      "filter": {
+        "District": "Achievement First Hartford Academy District",
+        "Year": "2014-2015",
+        "Variable": "Number of students with at least 1 bullying incident",
+        "Measure Type": "Number" 
+      },
+      "expected": {
+        "type": "$match",
+        "number type": "int",
+        "value": -9999
+      }
+    }, 
+    {
+      "type": "$lookup",
+      "filter": {
+        "District": "Regional School District 17",
+        "Year": "2015-2016",
+        "Variable": "Counts of Bullying Incidents",
+        "Measure Type": "Number" 
+      },
+      "expected": {
+        "type": "$match",
+        "number type": "int",
+        "value": -6666
+      }
+    }
+  ],
   "dimension_groups": [
-    {"Measure Type": []},
-    {"Variable": []}
+    {
+      "Variable": [
+        "Number of students with at least 1 bullying incident",
+        "Counts of Bullying Incidents"          
+      ]
+    }
   ]
 }
