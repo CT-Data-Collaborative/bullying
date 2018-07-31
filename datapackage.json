@@ -55,7 +55,7 @@
           "type": "string",
           "dimension": true,
           "constraints": {
-			      "enum": ["Students with at least 1", 
+			      "enum": ["Students with at least 1 incident", 
 			               "Total Incidents"
 			      ]
 			    }
@@ -76,7 +76,7 @@
     },
     "suppression": {
       "ckan_name": "Suppression",
-      "value": "Observations of less than 6 have been suppressed.",
+      "value": "Observations of less than 6 have been suppressed and denoted with an asterisk (*) or -9999 in the raw data view. Missing values are denoted with a -6666.",
       "type": "string"
     },
     "technical_notes": {
@@ -149,7 +149,8 @@
 			  "District": "Connecticut",
 			  "Year": ["2016-2017"],
 				"Measure Type": "Number", 
-				"Incident Type": "Bullying"
+				"Incident Type": "Bullying", 
+				"Variable": ["Total Incidents", "Students with at least 1 incident"]
 			},
 		  	"type": "object"
     }  
@@ -161,7 +162,7 @@
         "District": "Connecticut",
         "Year": "2012-2013", 
         "Incident Type": "Bullying",
-        "Variable": "Students with at least 1", 
+        "Variable": "Students with at least 1 incident", 
         "Measure Type": "Number" 
       },
       "expected": {
@@ -191,7 +192,7 @@
         "District": "Madison School District",
         "Year": "2014-2015", 
         "Incident Type": "Bullying",
-        "Variable": "Students with at least 1", 
+        "Variable": "Students with at least 1 incident", 
         "Measure Type": "Number" 
       },
       "expected": {
@@ -221,7 +222,7 @@
         "District": "Windham School District",
         "Year": "2016-2017", 
         "Incident Type": "Bullying",
-        "Variable": "Students with at least 1", 
+        "Variable": "Students with at least 1 incident", 
         "Measure Type": "Number" 
       },
       "expected": {
@@ -235,7 +236,7 @@
     {
       "Measure Type": ["Number"],
       "Incident Type": ["Bullying"],
-      "Variable": ["Students with at least 1", 
+      "Variable": ["Students with at least 1 incident", 
 			             "Total Incidents"]
     }
   ]

@@ -83,7 +83,7 @@ complete_bullying <- merge(bullying_fips, backfill_years, all.y=T)
 
 #Rename variables
 complete_bullying <- complete_bullying %>% 
-  rename(`Students with at least 1` = `Number of students with at least 1 bullying incident`, `Total Incidents` = `Counts of Bullying Incidents`)
+  rename(`Students with at least 1 incident` = `Number of students with at least 1 bullying incident`, `Total Incidents` = `Counts of Bullying Incidents`)
 
 #reshape from wide to long format
 complete_bullying_long <- gather(complete_bullying, Variable, Value, 3:4, factor_key=FALSE)
