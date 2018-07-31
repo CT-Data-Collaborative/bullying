@@ -1,5 +1,6 @@
 library(dplyr)
 library(datapkg)
+library(tidyr)
 
 ##################################################################
 #
@@ -11,57 +12,44 @@ library(datapkg)
 
 #Setup environment
 sub_folders <- list.files()
-
-#Name to EdSight top level folder
-raw_from_github_location <- grep("Raw", sub_folders, value=T)
-
-#Path to EdSight top level folder
-raw_from_github_path <- (paste0(getwd(), "/", raw_from_github_location))
-
-#paths to EdSight data folder
-raw_dataset_paths <- list.dirs(raw_from_github_path, full.names = TRUE)
-
-#all DP "raw" paths
-all_DP_raw_paths <- ls(pattern="_dp_path")
-all_DP_raw_files <- ls(pattern="_files")
-
-# "bully_dp_path"          
-# "chronic_absent_dp_path" 
-# "coll_prep_dp_path"      
-# "disability_dp_path"     
-# "ed_qual_dp_path"       
-# "incidents_dp_path"      
-# "sanctions_dp_path"      
-# "staff_lvls_dp_path"     
-# "stdnt_enroll_dp_path"   
-# "susp_rates_dp_path"
+raw_location <- grep("^raw", sub_folders, value=T)
+path_to_raw <- (paste0(getwd(), "/", raw_location))
+all_csvs <- dir(path_to_raw, recursive=T, pattern = ".csv") 
+all_state_csvs <- dir(path_to_raw, recursive=T, pattern = "ct.csv") 
+all_dist_csvs <- all_csvs[!all_csvs %in% all_state_csvs]
 
 
-#assign rownames based on first column
-#assign colnames based on which ever row starts with District
-#remove rownames
-#colnames(current_file) = current_file[1, ] # the first row will be the header
-#remove first row
-#remove district code column
-
-bullying <- data.frame(stringsAsFactors = F)
-bully_files_noTrend <- grep("Trend", bully_files, value=T, invert=T)
-###Bullying###
-for (i in 1:length(bully_files_noTrend)) {
-  current_file <- read.csv(paste0(bully_dp_path, "/", bully_files_noTrend[i]), stringsAsFactors=F, header=F )
+#District level data
+bullying_dist <- data.frame(stringsAsFactors = F)
+for (i in 1:length(all_dist_csvs)) {
+  current_file <- read.csv(paste0(path_to_raw, "/", all_dist_csvs[i]), stringsAsFactors=F, header=F)
   current_file <- current_file[-c(1:3),]
-  rownames(current_file) <- current_file[,1]
-  colnames(current_file) <- current_file[which(rownames(current_file) %in% c("District", "DISTRICT")), ]
-  rownames(current_file) <- NULL
-  current_file = current_file[-1, ] 
+  colnames(current_file) <- current_file[1,]
+  current_file <- current_file[-1,]
   current_file <- current_file[, !(names(current_file) == "District Code")]
-  get_year <- as.numeric(substr(unique(unlist(gsub("[^0-9]", "", unlist(bully_files_noTrend[i])), "")), 1, 4))
+  get_year <- as.numeric(substr(unique(unlist(gsub("[^0-9]", "", unlist(all_dist_csvs[i])), "")), 1, 4))
   get_year <- paste0(get_year, "-", get_year + 1) 
   current_file$Year <- get_year
-  bullying <- rbind(bullying, current_file)
+  bullying_dist <- rbind(bullying_dist, current_file)
 }
 
-#Add statewide data...
+#State level data
+bullying_state <- data.frame(stringsAsFactors = F)
+for (i in 1:length(all_state_csvs)) {
+  current_file <- read.csv(paste0(path_to_raw, "/", all_state_csvs[i]), stringsAsFactors=F, header=F )
+  current_file <- current_file[-c(1:3),]
+  colnames(current_file) <- current_file[1,]
+  current_file <- current_file[-1,]
+  names(current_file)[names(current_file)=="STATE"] <- "DISTRICT"
+  current_file$DISTRICT <- "Connecticut"
+  get_year <- as.numeric(substr(unique(unlist(gsub("[^0-9]", "", unlist(all_state_csvs[i])), "")), 1, 4))
+  get_year <- paste0(get_year, "-", get_year + 1) 
+  current_file$Year <- get_year
+  bullying_state <- rbind(bullying_state, current_file)
+}
+
+#Combine district and state
+bullying <- rbind(bullying_dist, bullying_state)
 
 #backfill Districts
 district_dp_URL <- 'https://raw.githubusercontent.com/CT-Data-Collaborative/ct-school-district-list/master/datapackage.json'
@@ -72,13 +60,14 @@ bullying_fips <- merge(bullying, districts, by.x = "DISTRICT", by.y = "District"
 
 bullying_fips$DISTRICT <- NULL
 
-bullying_fips<-bullying_fips[!duplicated(bullying_fips), ]
+bullying_fips <- unique(bullying_fips)
 
 #backfill year
 years <- c("2012-2013",
            "2013-2014",
            "2014-2015",
-           "2015-2016")
+           "2015-2016", 
+           "2016-2017")
 
 backfill_years <- expand.grid(
   `FixedDistrict` = unique(districts$`FixedDistrict`),
@@ -90,59 +79,37 @@ backfill_years$Year <- as.character(backfill_years$Year)
 
 backfill_years <- arrange(backfill_years, FixedDistrict)
 
-complete_bullying <- merge(bullying_fips, backfill_years, all=T)
-complete_bullying$DISTRICT <- NULL
+complete_bullying <- merge(bullying_fips, backfill_years, all.y=T)
 
-#remove duplicated Year rows
-complete_bullying <- complete_bullying[!with(complete_bullying, is.na(complete_bullying$Year)),]
-
-#recode missing data with -6666
-complete_bullying[["Number of students with at least 1 bullying incident"]][is.na(complete_bullying[["Number of students with at least 1 bullying incident"]])] <- -6666
-complete_bullying[["Counts of Bullying Incidents"]][is.na(complete_bullying[["Counts of Bullying Incidents"]])] <- -6666
-
-#recode suppressed data with -9999
-complete_bullying[["Number of students with at least 1 bullying incident"]][complete_bullying$"Number of students with at least 1 bullying incident" == "*"]<- -9999
-complete_bullying[["Counts of Bullying Incidents"]][complete_bullying$"Counts of Bullying Incidents" == "*"]<- -9999
-
-#return blank in FIPS if not reported
-complete_bullying$FIPS <- as.character(complete_bullying$FIPS)
-complete_bullying[["FIPS"]][is.na(complete_bullying[["FIPS"]])] <- ""
-
+#Rename variables
+complete_bullying <- complete_bullying %>% 
+  rename(`Students with at least 1` = `Number of students with at least 1 bullying incident`, `Total Incidents` = `Counts of Bullying Incidents`)
 
 #reshape from wide to long format
-cols_to_stack <- c("Number of students with at least 1 bullying incident", 
-                   "Counts of Bullying Incidents")
-
-long_row_count = nrow(complete_bullying) * length(cols_to_stack)
-
-complete_bullying_long <- reshape(complete_bullying, 
-                         varying = cols_to_stack, 
-                         v.names = "Value", 
-                         timevar = "Variable", 
-                         times = cols_to_stack, 
-                         new.row.names = 1:long_row_count,
-                         direction = "long"
-)
-#Rename FixedDistrict to District
-names(complete_bullying_long)[names(complete_bullying_long) == 'FixedDistrict'] <- 'District'
-
-#reorder columns and remove ID column
-complete_bullying_long <- complete_bullying_long[order(complete_bullying_long$District, complete_bullying_long$Year),]
-complete_bullying_long$id <- NULL
+complete_bullying_long <- gather(complete_bullying, Variable, Value, 3:4, factor_key=FALSE)
 
 #Add Measure Type
 complete_bullying_long$`Measure Type` <- "Number"
+complete_bullying_long$`Incident Type` <- "Bullying"
 
-#Order columns
+#Order, sort, and rename columns
 complete_bullying_long <- complete_bullying_long %>% 
-  select(`District`, `FIPS`, `Year`, `Variable`, `Measure Type`, `Value`)
+  select(FixedDistrict, FIPS, Year, `Incident Type`, `Measure Type`, Variable, Value) %>% 
+  rename(District = FixedDistrict) %>% 
+  arrange(District, Year, `Incident Type`)
 
-bully_data_path <- (paste0(getwd(), "/", bully_dp_location))
+#return blank in FIPS if not reported
+complete_bullying_long$FIPS <- as.character(complete_bullying_long$FIPS)
+complete_bullying_long[["FIPS"]][is.na(complete_bullying_long[["FIPS"]])] <- ""
+
+#recode suppressed data with -9999
+complete_bullying_long[complete_bullying_long == "*"]<- -9999
 
 #Write CSV
 write.table(
   complete_bullying_long,
-  file.path(bully_data_path, "data", "bullying_2013-2016.csv"),
+  file.path(getwd(), "data", "bullying_2013-2017.csv"),
   sep = ",",
+  na = "-6666",
   row.names = F
 )
