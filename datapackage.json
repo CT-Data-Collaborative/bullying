@@ -71,7 +71,7 @@
   "ckan_extras": {
     "full_description": {
       "ckan_name": "Full Description",
-      "value": "Data are reported as part of the Student Disciplinary Offense Data Collection (ED166). According to EdSight, bullying incidents are associated with repeated negative behaviors intended to frighten or discomfort.",
+      "value": "Data are reported as part of the Student Disciplinary Offense Data Collection (ED166). According to EdSight, bullying incidents are associated with repeated negative behaviors intended to frighten or discomfort. In the 2019-20 school year, due to the COVID-19 pandemic, in-person classes were cancelled in mid-March; all districts switched to fully remote instruction for the remainder of the school year.",
       "type": "string"
     },
     "suppression": {
