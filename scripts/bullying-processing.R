@@ -67,7 +67,10 @@ years <- c("2012-2013",
            "2013-2014",
            "2014-2015",
            "2015-2016", 
-           "2016-2017")
+           "2016-2017",
+           "2017-2018",
+           "2018-2019",
+           "2019-2020")
 
 backfill_years <- expand.grid(
   `FixedDistrict` = unique(districts$`FixedDistrict`),
@@ -108,7 +111,7 @@ complete_bullying_long[complete_bullying_long == "*"]<- -9999
 #Write CSV
 write.table(
   complete_bullying_long,
-  file.path(getwd(), "data", "bullying_2013-2017.csv"),
+  file.path(getwd(), "data", "bullying_2013-2020.csv"),
   sep = ",",
   na = "-6666",
   row.names = F

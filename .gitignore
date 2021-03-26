@@ -2,3 +2,6 @@
 .cache/
 venv/
 .Rproj.user
+.Rhistory
+*.Rproj
+.DS_Store
