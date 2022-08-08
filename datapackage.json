@@ -21,7 +21,7 @@
   }],
   "contributor": [],
   "resources": [{
-    "path": "data/bullying_2013-2020.csv",
+    "path": "data/bullying_2013-2021.csv",
     "format": "csv",
     "schema": {
       "fields": [{
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "last_modified": "03/26/2021",
+  "last_modified": "08/04/2022",
   "ckan_extras": {
     "full_description": {
       "ckan_name": "Full Description",
@@ -117,12 +117,12 @@
     },
     "years_in_catalog": {
       "ckan_name": "Years in Catalog",
-      "value": ["2012-2013", "2013-2014", "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019", "2019-2020"],
+      "value": ["2012-2013", "2013-2014", "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019", "2019-2020", "2020-2021"],
       "type": "array"
     },
     "latest_year": {
       "ckan_name": "Latest Year Available",
-      "value": "2019-2020",
+      "value": "2020-2021",
       "type": "string"
     },
     "disabled_views": {
@@ -147,7 +147,7 @@
       "ckan_name": "Default",
 			"value": {
 			  "District": "Connecticut",
-			  "Year": ["2019-2020"],
+			  "Year": ["2020-2021"],
 				"Measure Type": "Number", 
 				"Incident Type": "Bullying", 
 				"Variable": ["Total Incidents", "Students with at least 1 incident"]
